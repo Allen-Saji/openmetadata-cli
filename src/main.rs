@@ -50,6 +50,9 @@ enum Commands {
 
     /// Search the catalog
     Search(commands::search::SearchArgs),
+
+    /// Describe an entity by FQN
+    Describe(commands::describe::DescribeArgs),
 }
 
 #[tokio::main]
@@ -77,5 +80,6 @@ async fn dispatch(cli: Cli) -> CliResult<()> {
         Commands::Auth { action } => commands::auth::run(&cli.profile, action, &ctx).await,
         Commands::Sync(args) => commands::sync::run(&cli.profile, args, &ctx).await,
         Commands::Search(args) => commands::search::run(&cli.profile, args, &ctx).await,
+        Commands::Describe(args) => commands::describe::run(&cli.profile, args, &ctx).await,
     }
 }
