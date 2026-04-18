@@ -56,12 +56,25 @@ enum Commands {
 
     /// Raw HTTP request against the OpenMetadata API
     Raw(commands::raw::RawArgs),
+
+    /// Dynamic OpenAPI-backed commands: `omd <group> <action> [args]`
+    #[command(external_subcommand)]
+    Dynamic(Vec<String>),
 }
 
 #[tokio::main]
 async fn main() {
     init_tracing();
-    let cli = Cli::parse();
+    let matches = <Cli as clap::CommandFactory>::command()
+        .after_help(spec::dynamic::after_help())
+        .get_matches();
+    let cli = match <Cli as clap::FromArgMatches>::from_arg_matches(&matches) {
+        Ok(cli) => cli,
+        Err(e) => {
+            eprintln!("{e}");
+            std::process::exit(64);
+        }
+    };
     if let Err(e) = dispatch(cli).await {
         output::render_error(&e);
         std::process::exit(e.exit_code());
@@ -71,7 +84,10 @@ async fn main() {
 fn init_tracing() {
     use tracing_subscriber::{fmt, EnvFilter};
     let filter = EnvFilter::try_from_env("OMD_LOG").unwrap_or_else(|_| EnvFilter::new("warn"));
-    fmt().with_env_filter(filter).with_writer(std::io::stderr).init();
+    fmt()
+        .with_env_filter(filter)
+        .with_writer(std::io::stderr)
+        .init();
 }
 
 async fn dispatch(cli: Cli) -> CliResult<()> {
@@ -85,5 +101,6 @@ async fn dispatch(cli: Cli) -> CliResult<()> {
         Commands::Search(args) => commands::search::run(&cli.profile, args, &ctx).await,
         Commands::Describe(args) => commands::describe::run(&cli.profile, args, &ctx).await,
         Commands::Raw(args) => commands::raw::run(&cli.profile, args, &ctx).await,
+        Commands::Dynamic(args) => spec::dynamic::dispatch(&cli.profile, &ctx, args).await,
     }
 }
