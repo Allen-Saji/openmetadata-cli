@@ -92,6 +92,25 @@ impl OmdClient {
         let resp = req.send().await?;
         read_json(resp).await
     }
+
+    /// Send a request with a `text/plain` body. Used by CSV import endpoints.
+    pub async fn request_text(
+        &self,
+        method: Method,
+        path: &str,
+        query: &[(String, String)],
+        body: String,
+    ) -> CliResult<Response> {
+        let url = self.url(path);
+        let mut req = self
+            .http
+            .request(method, &url)
+            .query(query)
+            .header(header::CONTENT_TYPE, "text/plain")
+            .body(body);
+        req = self.authed(req);
+        Ok(req.send().await?)
+    }
 }
 
 pub async fn read_json(resp: Response) -> CliResult<serde_json::Value> {
