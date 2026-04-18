@@ -4,7 +4,7 @@ Command-line tool for [OpenMetadata](https://github.com/open-metadata/OpenMetada
 
 Dynamic command surface generated from OpenMetadata's OpenAPI spec, plus hand-tuned "smart" commands for the common workflows (search, describe, lineage, quality, CSV import/export). Structured JSON output for scripts and agents. Ships an MCP server mode (`omd mcp`) so AI agents can drive OpenMetadata directly.
 
-Status: **v0.5 (early development)**. Not on crates.io yet.
+Status: **v0.6 (early development)**. Not on crates.io yet.
 
 ## Install (source, for now)
 
@@ -154,6 +154,32 @@ Add to `~/.cursor/mcp.json`:
 
 With `omd configure` + `omd auth login` already run, no env vars are needed.
 
+## SSO login (v0.6)
+
+For OpenMetadata servers with OIDC-backed SSO (Google, Okta, Azure AD, Auth0, ...):
+
+```bash
+omd auth login --sso
+# opens the browser, completes the OIDC flow, saves the id_token
+```
+
+Behind the scenes:
+
+1. Reads the server's public auth config at `/api/v1/system/config/auth` to discover the provider and authority.
+2. Discovers the authorize/token endpoints via `.well-known/openid-configuration`.
+3. Runs the OIDC authorization-code flow with PKCE (S256), binding a random loopback port for the callback.
+4. Stores the resulting token the same way `--token` would.
+
+Orgs that register a separate public OIDC client for CLIs (like `kubectl`/`gh`) can override the client:
+
+```bash
+omd auth login --sso --client-id <public-client-id>
+omd auth login --sso --authority https://custom-idp.example.com
+omd auth login --sso --scopes "openid email profile offline_access"
+```
+
+SAML is intentionally not supported. SAML users can still paste a JWT directly with `omd auth login --token ...`.
+
 Environment overrides:
 
 - `OMD_HOST` — server URL
@@ -175,7 +201,7 @@ Stored in `~/.omd/`:
 - v0.3 lineage, quality, edit, tag, glossary, completions
 - v0.4 CSV import/export
 - v0.5 MCP server mode (rmcp, 14 curated tools)
-- v0.6 SSO login (OIDC/PKCE)
+- v0.6 SSO login (OIDC/PKCE with browser loopback)
 - v0.7 release automation, installer
 - v1.0 stable
 
