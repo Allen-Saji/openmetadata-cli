@@ -74,6 +74,24 @@ impl OmdClient {
     pub async fn get_json(&self, path: &str) -> CliResult<serde_json::Value> {
         self.json(Method::GET, path, &[], None).await
     }
+
+    /// Send a RFC-6902 JSON Patch with `application/json-patch+json`, the
+    /// content type required by OpenMetadata's PATCH endpoints.
+    pub async fn json_patch(
+        &self,
+        path: &str,
+        ops: &serde_json::Value,
+    ) -> CliResult<serde_json::Value> {
+        let url = self.url(path);
+        let mut req = self
+            .http
+            .request(Method::PATCH, &url)
+            .header(header::CONTENT_TYPE, "application/json-patch+json")
+            .json(ops);
+        req = self.authed(req);
+        let resp = req.send().await?;
+        read_json(resp).await
+    }
 }
 
 pub async fn read_json(resp: Response) -> CliResult<serde_json::Value> {
