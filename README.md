@@ -4,7 +4,7 @@ Command-line tool for [OpenMetadata](https://github.com/open-metadata/OpenMetada
 
 Dynamic command surface generated from OpenMetadata's OpenAPI spec, plus hand-tuned "smart" commands for the common workflows (search, describe, lineage, quality, CSV import/export). Structured JSON output for scripts and agents. Ships an MCP server mode (`omd mcp`) so AI agents can drive OpenMetadata directly.
 
-Status: **v0.4 (early development)**. Not on crates.io yet.
+Status: **v0.5 (early development)**. Not on crates.io yet.
 
 ## Install (source, for now)
 
@@ -105,6 +105,55 @@ Supported entity types: `table`, `database`, `databaseSchema`, `glossary`,
 `glossaryTerm`, `team`, `user`, `databaseService`, `securityService`,
 `driveService`, `testCase`.
 
+## MCP server (v0.5)
+
+`omd mcp` starts a Model Context Protocol server on stdio so AI agents
+(Claude Desktop, Cursor, Claude Code, etc.) can drive OpenMetadata through
+a curated tool surface.
+
+Exposed tools: `search`, `resolve_fqn`, `describe_entity`, `get_lineage`,
+`list_upstream`, `list_downstream`, `update_description`, `add_tag`,
+`remove_tag`, `assign_glossary_term`, `list_quality_tests`,
+`get_test_results`, `export_csv`, `import_csv`. An opt-in `raw_request`
+tool is available when the server is started with `OMD_MCP_ALLOW_RAW=1`.
+
+### Claude Desktop
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`
+(macOS) or the equivalent on other platforms:
+
+```json
+{
+  "mcpServers": {
+    "openmetadata": {
+      "command": "omd",
+      "args": ["mcp"],
+      "env": {
+        "OMD_HOST": "https://your-openmetadata-host",
+        "OMD_TOKEN": "your-jwt"
+      }
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to `~/.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "openmetadata": {
+      "command": "omd",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+With `omd configure` + `omd auth login` already run, no env vars are needed.
+
 Environment overrides:
 
 - `OMD_HOST` — server URL
@@ -125,7 +174,7 @@ Stored in `~/.omd/`:
 - v0.2 dynamic command generation from OpenAPI spec
 - v0.3 lineage, quality, edit, tag, glossary, completions
 - v0.4 CSV import/export
-- v0.5 MCP server mode
+- v0.5 MCP server mode (rmcp, 14 curated tools)
 - v0.6 SSO login (OIDC/PKCE)
 - v0.7 release automation, installer
 - v1.0 stable
