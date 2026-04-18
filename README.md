@@ -4,7 +4,7 @@ Command-line tool for [OpenMetadata](https://github.com/open-metadata/OpenMetada
 
 Dynamic command surface generated from OpenMetadata's OpenAPI spec, plus hand-tuned "smart" commands for the common workflows (search, describe, lineage, quality, CSV import/export). Structured JSON output for scripts and agents. Ships an MCP server mode (`omd mcp`) so AI agents can drive OpenMetadata directly.
 
-Status: **v0.1 (early development)**. Not on crates.io yet.
+Status: **v0.2 (early development)**. Not on crates.io yet.
 
 ## Install (source, for now)
 
@@ -25,6 +25,29 @@ omd describe service.db.schema.table       # show entity details
 omd raw GET v1/tables -q limit=5           # escape hatch
 omd sync                                   # refresh cached OpenAPI spec
 ```
+
+## Dynamic commands (v0.2)
+
+After `omd sync`, every tag in the OpenAPI spec becomes a subcommand group and every
+operation becomes an action. The shape matches `gh <group> <action>` / `kubectl <group> <action>`.
+
+```bash
+omd tables list --limit 10
+omd tables get-by-id <id>
+omd tables get-by-fqn <fqn> --fields columns,owners
+omd tables patch <id> --body @patch.json
+omd domains list
+omd classifications create --body '{"name":"pii"}'
+```
+
+Available action groups surface in `omd --help`; run `omd <group> --help` to see actions,
+and `omd <group> <action> --help` for per-operation flags.
+
+Body input forms for any action that accepts a request body:
+
+- inline JSON: `--body '{"name":"orders"}'`
+- file: `--body @payload.json`
+- stdin: `--body -`
 
 Environment overrides:
 
