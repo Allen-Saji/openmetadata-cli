@@ -44,6 +44,9 @@ enum Commands {
         #[command(subcommand)]
         action: commands::auth::Action,
     },
+
+    /// Refresh the cached OpenAPI spec
+    Sync(commands::sync::SyncArgs),
 }
 
 #[tokio::main]
@@ -69,5 +72,6 @@ async fn dispatch(cli: Cli) -> CliResult<()> {
             commands::configure::run(&cli.profile, action, &ctx).await
         }
         Commands::Auth { action } => commands::auth::run(&cli.profile, action, &ctx).await,
+        Commands::Sync(args) => commands::sync::run(&cli.profile, args, &ctx).await,
     }
 }
