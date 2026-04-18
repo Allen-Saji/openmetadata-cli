@@ -8,6 +8,8 @@ mod config;
 mod error;
 #[allow(dead_code)]
 mod output;
+#[allow(dead_code)]
+mod spec;
 
 fn main() {
     println!("Hello, world!");
