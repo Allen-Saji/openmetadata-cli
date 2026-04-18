@@ -1,0 +1,56 @@
+# omd — OpenMetadata CLI
+
+Command-line tool for [OpenMetadata](https://github.com/open-metadata/OpenMetadata). Written in Rust.
+
+Dynamic command surface generated from OpenMetadata's OpenAPI spec, plus hand-tuned "smart" commands for the common workflows (search, describe, lineage, quality, CSV import/export). Structured JSON output for scripts and agents. Ships an MCP server mode (`omd mcp`) so AI agents can drive OpenMetadata directly.
+
+Status: **v0.1 (early development)**. Not on crates.io yet.
+
+## Install (source, for now)
+
+```bash
+git clone https://github.com/Allen-Saji/openmetadata-cli.git
+cd openmetadata-cli
+cargo install --path .
+```
+
+## Quick start
+
+```bash
+omd configure                              # interactive setup
+omd auth login                             # paste JWT (input hidden)
+omd auth status                            # verify
+omd search tables customer                 # find entities
+omd describe service.db.schema.table       # show entity details
+omd raw GET v1/tables -q limit=5           # escape hatch
+omd sync                                   # refresh cached OpenAPI spec
+```
+
+Environment overrides:
+
+- `OMD_HOST` — server URL
+- `OMD_TOKEN` — JWT bearer token
+- `OMD_PROFILE` — which saved profile to use
+- `OMD_LOG` — tracing filter (`info`, `debug`, etc.)
+
+## Configuration
+
+Stored in `~/.omd/`:
+
+- `config.toml` — host, timeout, per-profile settings
+- `credentials` — JWT tokens (mode 0600)
+
+## Roadmap
+
+- v0.1 configure, JWT auth, search, describe, raw, sync
+- v0.2 dynamic command generation from OpenAPI spec
+- v0.3 lineage, quality, edit, tag, glossary, completions
+- v0.4 CSV import/export
+- v0.5 MCP server mode
+- v0.6 SSO login (OIDC/PKCE)
+- v0.7 release automation, installer
+- v1.0 stable
+
+## License
+
+Apache-2.0
