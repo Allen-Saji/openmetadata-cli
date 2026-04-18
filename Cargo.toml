@@ -1,6 +1,6 @@
 [package]
 name = "omd"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 description = "Command-line tool for OpenMetadata"
 authors = ["Allen Saji <allensaji04@gmail.com>"]
@@ -29,6 +29,8 @@ colored = "2"
 comfy-table = "7"
 dialoguer = "0.11"
 indicatif = "0.17"
+rmcp = { version = "1.5", features = ["server", "macros", "transport-io"] }
+schemars = "1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
