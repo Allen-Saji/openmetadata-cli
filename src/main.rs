@@ -53,6 +53,9 @@ enum Commands {
 
     /// Describe an entity by FQN
     Describe(commands::describe::DescribeArgs),
+
+    /// Raw HTTP request against the OpenMetadata API
+    Raw(commands::raw::RawArgs),
 }
 
 #[tokio::main]
@@ -81,5 +84,6 @@ async fn dispatch(cli: Cli) -> CliResult<()> {
         Commands::Sync(args) => commands::sync::run(&cli.profile, args, &ctx).await,
         Commands::Search(args) => commands::search::run(&cli.profile, args, &ctx).await,
         Commands::Describe(args) => commands::describe::run(&cli.profile, args, &ctx).await,
+        Commands::Raw(args) => commands::raw::run(&cli.profile, args, &ctx).await,
     }
 }
