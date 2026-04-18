@@ -4,6 +4,8 @@ mod client;
 mod config;
 #[allow(dead_code)]
 mod error;
+#[allow(dead_code)]
+mod output;
 
 fn main() {
     println!("Hello, world!");
