@@ -4,7 +4,7 @@ Command-line tool for [OpenMetadata](https://github.com/open-metadata/OpenMetada
 
 Dynamic command surface generated from OpenMetadata's OpenAPI spec, plus hand-tuned "smart" commands for the common workflows (search, describe, lineage, quality, CSV import/export). Structured JSON output for scripts and agents. Ships an MCP server mode (`omd mcp`) so AI agents can drive OpenMetadata directly.
 
-Status: **v0.2 (early development)**. Not on crates.io yet.
+Status: **v0.3 (early development)**. Not on crates.io yet.
 
 ## Install (source, for now)
 
@@ -48,6 +48,40 @@ Body input forms for any action that accepts a request body:
 - inline JSON: `--body '{"name":"orders"}'`
 - file: `--body @payload.json`
 - stdin: `--body -`
+
+## Smart commands (v0.3)
+
+```bash
+# Lineage
+omd lineage svc.db.schema.orders                        # ascii tree, both directions
+omd lineage svc.db.schema.orders --up --depth 3         # upstream only
+omd lineage svc.db.schema.orders --format mermaid       # for docs / diagrams
+omd lineage svc.db.schema.orders --format dot | dot -Tpng -o l.png
+
+# Edit fields (fetches entity, computes JSON patch, sends it)
+omd edit svc.db.schema.orders --description @desc.md
+omd edit svc.db.schema.orders --display-name "Orders"
+omd edit svc.db.schema.orders --owner some.user         # FQN of user or team
+omd edit svc.db.schema.orders --tier Tier.Tier1
+omd edit ... --dry-run                                  # print patch, don't send
+
+# Tags
+omd tag svc.db.schema.orders --add PII.Sensitive --add Tier.Tier2
+omd tag svc.db.schema.orders --remove PII.Sensitive
+
+# Glossary
+omd glossary assign svc.db.schema.orders --term CustomerData.Email
+
+# Data quality
+omd quality list --table svc.db.schema.orders
+omd quality results <test-case-fqn> --limit 20
+omd quality latest svc.db.schema.orders
+
+# Shell completions
+omd completions bash > /etc/bash_completion.d/omd
+omd completions zsh  > ~/.config/zsh/functions/_omd
+omd completions fish > ~/.config/fish/completions/omd.fish
+```
 
 Environment overrides:
 
