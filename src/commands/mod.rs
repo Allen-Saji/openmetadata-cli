@@ -7,6 +7,7 @@ pub mod export;
 pub mod glossary;
 pub mod import;
 pub mod lineage;
+pub mod mcp;
 pub mod quality;
 pub mod raw;
 pub mod search;

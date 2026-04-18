@@ -5,6 +5,7 @@ mod client;
 mod commands;
 mod config;
 mod error;
+mod mcp;
 mod output;
 mod spec;
 mod util;
@@ -85,6 +86,9 @@ enum Commands {
     /// Generate a shell completion script
     Completions(commands::completions::CompletionsArgs),
 
+    /// Start the MCP (Model Context Protocol) server on stdio
+    Mcp(commands::mcp::McpArgs),
+
     /// Raw HTTP request against the OpenMetadata API
     Raw(commands::raw::RawArgs),
 
@@ -139,6 +143,7 @@ async fn dispatch(cli: Cli) -> CliResult<()> {
         Commands::Export(args) => commands::export::run(&cli.profile, args, &ctx).await,
         Commands::Import(args) => commands::import::run(&cli.profile, args, &ctx).await,
         Commands::Completions(args) => commands::completions::run::<Cli>(args),
+        Commands::Mcp(args) => commands::mcp::run(args, &ctx).await,
         Commands::Raw(args) => commands::raw::run(&cli.profile, args, &ctx).await,
         Commands::Dynamic(args) => spec::dynamic::dispatch(&cli.profile, &ctx, args).await,
     }
