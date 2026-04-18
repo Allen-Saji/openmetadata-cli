@@ -1,6 +1,6 @@
 [package]
 name = "omd"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "Command-line tool for OpenMetadata"
 authors = ["Allen Saji <allensaji04@gmail.com>"]
@@ -16,6 +16,7 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4", features = ["derive", "env"] }
+clap_complete = "4"
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
