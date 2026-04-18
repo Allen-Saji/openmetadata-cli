@@ -5,3 +5,8 @@ Cargo.lock.backup
 .DS_Store
 .vscode/
 .idea/
+
+# Large sandbox spec used only for ad-hoc testing. Fetch locally with:
+#   curl -o tests/fixtures/sandbox-spec.json https://sandbox.open-metadata.org/swagger.json
+# then run `cargo test -- --ignored sandbox_spec_indexes`.
+tests/fixtures/sandbox-spec.json

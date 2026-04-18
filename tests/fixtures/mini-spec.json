@@ -1,0 +1,37 @@
+{
+  "openapi": "3.0.1",
+  "info": { "title": "Mini Test API", "version": "0.0.1" },
+  "paths": {
+    "/v1/tables": {
+      "get": {
+        "operationId": "listTables",
+        "tags": ["Tables"],
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } },
+          { "name": "fields", "in": "query", "schema": { "type": "string" } }
+        ]
+      },
+      "post": {
+        "operationId": "createTable",
+        "tags": ["Tables"],
+        "requestBody": { "required": true }
+      }
+    },
+    "/v1/tables/{id}": {
+      "parameters": [
+        { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+      ],
+      "get": {
+        "operationId": "getTableByID",
+        "tags": ["Tables"],
+        "parameters": [
+          { "name": "fields", "in": "query", "schema": { "type": "string" } }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteTable",
+        "tags": ["Tables"]
+      }
+    }
+  }
+}
