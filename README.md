@@ -4,9 +4,42 @@ Command-line tool for [OpenMetadata](https://github.com/open-metadata/OpenMetada
 
 Dynamic command surface generated from OpenMetadata's OpenAPI spec, plus hand-tuned "smart" commands for the common workflows (search, describe, lineage, quality, CSV import/export). Structured JSON output for scripts and agents. Ships an MCP server mode (`omd mcp`) so AI agents can drive OpenMetadata directly.
 
-Status: **v0.6 (early development)**. Not on crates.io yet.
+Status: **v0.7**.
 
-## Install (source, for now)
+## Install
+
+Pick whichever fits your machine.
+
+### Script (Linux, macOS)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Allen-Saji/openmetadata-cli/main/install.sh | sh
+```
+
+Installs the latest release binary to `~/.local/bin` (override with
+`INSTALL_DIR=/usr/local/bin`). Pin a version with `OMD_VERSION=v0.7.0`.
+
+### Homebrew
+
+```bash
+brew tap Allen-Saji/tap
+brew install omd
+```
+
+### Cargo
+
+```bash
+cargo install openmetadata-cli            # publishes the `omd` binary
+```
+
+### Manual
+
+Grab a tarball for your platform from
+[GitHub Releases](https://github.com/Allen-Saji/openmetadata-cli/releases/latest)
+and extract `omd` onto your `PATH`. Each asset ships a `.sha256` next to it
+for verification.
+
+### From source
 
 ```bash
 git clone https://github.com/Allen-Saji/openmetadata-cli.git
@@ -202,7 +235,7 @@ Stored in `~/.omd/`:
 - v0.4 CSV import/export
 - v0.5 MCP server mode (rmcp, 14 curated tools)
 - v0.6 SSO login (OIDC/PKCE with browser loopback)
-- v0.7 release automation, installer
+- v0.7 release automation (install.sh, CI, tag-triggered cross-platform builds, Homebrew draft)
 - v1.0 stable
 
 ## License
