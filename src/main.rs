@@ -76,6 +76,12 @@ enum Commands {
         action: commands::quality::Action,
     },
 
+    /// Export entity metadata as CSV
+    Export(commands::export::ExportArgs),
+
+    /// Import entity metadata from a CSV file
+    Import(commands::import::ImportArgs),
+
     /// Generate a shell completion script
     Completions(commands::completions::CompletionsArgs),
 
@@ -130,6 +136,8 @@ async fn dispatch(cli: Cli) -> CliResult<()> {
         Commands::Tag(args) => commands::tag::run(&cli.profile, args, &ctx).await,
         Commands::Glossary { action } => commands::glossary::run(&cli.profile, action, &ctx).await,
         Commands::Quality { action } => commands::quality::run(&cli.profile, action, &ctx).await,
+        Commands::Export(args) => commands::export::run(&cli.profile, args, &ctx).await,
+        Commands::Import(args) => commands::import::run(&cli.profile, args, &ctx).await,
         Commands::Completions(args) => commands::completions::run::<Cli>(args),
         Commands::Raw(args) => commands::raw::run(&cli.profile, args, &ctx).await,
         Commands::Dynamic(args) => spec::dynamic::dispatch(&cli.profile, &ctx, args).await,
