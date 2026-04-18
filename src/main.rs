@@ -47,6 +47,9 @@ enum Commands {
 
     /// Refresh the cached OpenAPI spec
     Sync(commands::sync::SyncArgs),
+
+    /// Search the catalog
+    Search(commands::search::SearchArgs),
 }
 
 #[tokio::main]
@@ -73,5 +76,6 @@ async fn dispatch(cli: Cli) -> CliResult<()> {
         }
         Commands::Auth { action } => commands::auth::run(&cli.profile, action, &ctx).await,
         Commands::Sync(args) => commands::sync::run(&cli.profile, args, &ctx).await,
+        Commands::Search(args) => commands::search::run(&cli.profile, args, &ctx).await,
     }
 }
