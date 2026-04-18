@@ -3,6 +3,9 @@ use std::path::{Path, PathBuf};
 
 /// Path where the cached OpenAPI spec lives.
 pub fn cache_path() -> CliResult<PathBuf> {
+    if let Ok(home) = std::env::var("OMD_HOME") {
+        return Ok(PathBuf::from(home).join("spec.json"));
+    }
     let base = dirs::home_dir()
         .ok_or_else(|| crate::error::CliError::Config("no home directory".into()))?;
     Ok(base.join(".omd").join("spec.json"))
