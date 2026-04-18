@@ -38,6 +38,12 @@ enum Commands {
         #[command(subcommand)]
         action: Option<commands::configure::Action>,
     },
+
+    /// Authentication (login, status, logout)
+    Auth {
+        #[command(subcommand)]
+        action: commands::auth::Action,
+    },
 }
 
 #[tokio::main]
@@ -62,5 +68,6 @@ async fn dispatch(cli: Cli) -> CliResult<()> {
         Commands::Configure { action } => {
             commands::configure::run(&cli.profile, action, &ctx).await
         }
+        Commands::Auth { action } => commands::auth::run(&cli.profile, action, &ctx).await,
     }
 }
