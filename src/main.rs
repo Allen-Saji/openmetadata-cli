@@ -7,6 +7,7 @@ mod config;
 mod error;
 mod output;
 mod spec;
+mod util;
 
 use clap::{Parser, Subcommand};
 use error::CliResult;
@@ -54,6 +55,30 @@ enum Commands {
     /// Describe an entity by FQN
     Describe(commands::describe::DescribeArgs),
 
+    /// Show entity lineage (tree, mermaid, dot, or json)
+    Lineage(commands::lineage::LineageArgs),
+
+    /// Update entity fields (description, display name, owner, tier)
+    Edit(commands::edit::EditArgs),
+
+    /// Add or remove classification tags on an entity
+    Tag(commands::tag::TagArgs),
+
+    /// Glossary operations (assign terms)
+    Glossary {
+        #[command(subcommand)]
+        action: commands::glossary::Action,
+    },
+
+    /// Data quality: list, results, latest
+    Quality {
+        #[command(subcommand)]
+        action: commands::quality::Action,
+    },
+
+    /// Generate a shell completion script
+    Completions(commands::completions::CompletionsArgs),
+
     /// Raw HTTP request against the OpenMetadata API
     Raw(commands::raw::RawArgs),
 
@@ -100,6 +125,12 @@ async fn dispatch(cli: Cli) -> CliResult<()> {
         Commands::Sync(args) => commands::sync::run(&cli.profile, args, &ctx).await,
         Commands::Search(args) => commands::search::run(&cli.profile, args, &ctx).await,
         Commands::Describe(args) => commands::describe::run(&cli.profile, args, &ctx).await,
+        Commands::Lineage(args) => commands::lineage::run(&cli.profile, args, &ctx).await,
+        Commands::Edit(args) => commands::edit::run(&cli.profile, args, &ctx).await,
+        Commands::Tag(args) => commands::tag::run(&cli.profile, args, &ctx).await,
+        Commands::Glossary { action } => commands::glossary::run(&cli.profile, action, &ctx).await,
+        Commands::Quality { action } => commands::quality::run(&cli.profile, action, &ctx).await,
+        Commands::Completions(args) => commands::completions::run::<Cli>(args),
         Commands::Raw(args) => commands::raw::run(&cli.profile, args, &ctx).await,
         Commands::Dynamic(args) => spec::dynamic::dispatch(&cli.profile, &ctx, args).await,
     }

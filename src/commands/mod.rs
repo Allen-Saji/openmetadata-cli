@@ -1,6 +1,12 @@
 pub mod auth;
+pub mod completions;
 pub mod configure;
 pub mod describe;
+pub mod edit;
+pub mod glossary;
+pub mod lineage;
+pub mod quality;
 pub mod raw;
 pub mod search;
 pub mod sync;
+pub mod tag;
