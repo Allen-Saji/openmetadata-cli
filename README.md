@@ -4,7 +4,7 @@ Command-line tool for [OpenMetadata](https://github.com/open-metadata/OpenMetada
 
 Dynamic command surface generated from OpenMetadata's OpenAPI spec, plus hand-tuned "smart" commands for the common workflows (search, describe, lineage, quality, CSV import/export). Structured JSON output for scripts and agents. Ships an MCP server mode (`omd mcp`) so AI agents can drive OpenMetadata directly.
 
-Status: **v0.3 (early development)**. Not on crates.io yet.
+Status: **v0.4 (early development)**. Not on crates.io yet.
 
 ## Install (source, for now)
 
@@ -82,6 +82,28 @@ omd completions bash > /etc/bash_completion.d/omd
 omd completions zsh  > ~/.config/zsh/functions/_omd
 omd completions fish > ~/.config/fish/completions/omd.fish
 ```
+
+## CSV import / export (v0.4)
+
+```bash
+# Export an entity's metadata as CSV
+omd export table svc.db.schema.orders -o orders.csv
+omd export glossary Retail -o retail.csv
+omd export databaseSchema svc.db.schema -o schema.csv
+
+# Dry-run an import (default) to see what would change
+omd import table svc.db.schema.orders updates.csv
+
+# Commit the changes
+omd import table svc.db.schema.orders updates.csv --apply
+
+# Pipe a CSV from another tool
+some-generator | omd import table svc.db.schema.orders -
+```
+
+Supported entity types: `table`, `database`, `databaseSchema`, `glossary`,
+`glossaryTerm`, `team`, `user`, `databaseService`, `securityService`,
+`driveService`, `testCase`.
 
 Environment overrides:
 
