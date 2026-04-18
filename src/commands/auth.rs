@@ -74,7 +74,11 @@ async fn status(profile: &str, ctx: &OutputCtx) -> CliResult<()> {
                 .and_then(|s| s.as_str())
                 .unwrap_or("<unknown>")
                 .to_string();
-            let email = v.get("email").and_then(|s| s.as_str()).unwrap_or("").to_string();
+            let email = v
+                .get("email")
+                .and_then(|s| s.as_str())
+                .unwrap_or("")
+                .to_string();
             if output::pretty(ctx) {
                 output::print_kv(&[
                     ("profile", cfg.profile.clone()),

@@ -56,10 +56,17 @@ pub async fn run(profile: &str, args: SearchArgs, ctx: &OutputCtx) -> CliResult<
         .iter()
         .map(|h| {
             let src = h.get("_source").cloned().unwrap_or_default();
-            let name = s(&src, "fullyQualifiedName").or_else(|| s(&src, "name")).unwrap_or_default();
+            let name = s(&src, "fullyQualifiedName")
+                .or_else(|| s(&src, "name"))
+                .unwrap_or_default();
             let kind = s(&src, "entityType").unwrap_or_default();
             let svc = s(&src, "service")
-                .or_else(|| src.get("service").and_then(|v| v.get("name")).and_then(|v| v.as_str()).map(String::from))
+                .or_else(|| {
+                    src.get("service")
+                        .and_then(|v| v.get("name"))
+                        .and_then(|v| v.as_str())
+                        .map(String::from)
+                })
                 .unwrap_or_default();
             let desc = s(&src, "description").unwrap_or_default();
             vec![name, kind, svc, trim(&desc, 60)]

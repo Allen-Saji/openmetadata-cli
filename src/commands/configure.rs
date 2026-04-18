@@ -47,7 +47,11 @@ fn interactive(profile: &str, ctx: &OutputCtx) -> CliResult<()> {
 
     let (cfg_path, _) = paths_summary()?;
     if output::pretty(ctx) {
-        output::success(format!("saved profile '{}' to {}", profile, cfg_path.display()));
+        output::success(format!(
+            "saved profile '{}' to {}",
+            profile,
+            cfg_path.display()
+        ));
         output::info("next: run `omd auth login` to save an API token");
     } else {
         output::print_json(&serde_json::json!({
@@ -65,9 +69,9 @@ fn set(profile: &str, key: &str, value: &str, ctx: &OutputCtx) -> CliResult<()> 
     match key {
         "host" => p.host = Some(value.trim_end_matches('/').to_string()),
         "timeout" | "timeout_secs" => {
-            p.timeout_secs = value
-                .parse()
-                .map_err(|_| CliError::InvalidInput(format!("timeout must be u64, got '{value}'")))?;
+            p.timeout_secs = value.parse().map_err(|_| {
+                CliError::InvalidInput(format!("timeout must be u64, got '{value}'"))
+            })?;
         }
         _ => return Err(CliError::InvalidInput(format!("unknown key '{key}'"))),
     }

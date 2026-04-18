@@ -88,14 +88,22 @@ fn endpoint_for_type(t: &str) -> String {
 }
 
 fn pretty_entity(t: &str, v: &serde_json::Value) {
-    let name = v.get("fullyQualifiedName").or_else(|| v.get("name")).and_then(|s| s.as_str()).unwrap_or("");
+    let name = v
+        .get("fullyQualifiedName")
+        .or_else(|| v.get("name"))
+        .and_then(|s| s.as_str())
+        .unwrap_or("");
     let desc = v.get("description").and_then(|s| s.as_str()).unwrap_or("");
     let owners = v
         .get("owners")
         .and_then(|o| o.as_array())
         .map(|arr| {
             arr.iter()
-                .filter_map(|u| u.get("displayName").and_then(|s| s.as_str()).or_else(|| u.get("name").and_then(|s| s.as_str())))
+                .filter_map(|u| {
+                    u.get("displayName")
+                        .and_then(|s| s.as_str())
+                        .or_else(|| u.get("name").and_then(|s| s.as_str()))
+                })
                 .collect::<Vec<_>>()
                 .join(", ")
         })
@@ -126,9 +134,21 @@ fn pretty_entity(t: &str, v: &serde_json::Value) {
             let rows: Vec<Vec<String>> = cols
                 .iter()
                 .map(|c| {
-                    let n = c.get("name").and_then(|s| s.as_str()).unwrap_or("").to_string();
-                    let dt = c.get("dataType").and_then(|s| s.as_str()).unwrap_or("").to_string();
-                    let d = c.get("description").and_then(|s| s.as_str()).unwrap_or("").to_string();
+                    let n = c
+                        .get("name")
+                        .and_then(|s| s.as_str())
+                        .unwrap_or("")
+                        .to_string();
+                    let dt = c
+                        .get("dataType")
+                        .and_then(|s| s.as_str())
+                        .unwrap_or("")
+                        .to_string();
+                    let d = c
+                        .get("description")
+                        .and_then(|s| s.as_str())
+                        .unwrap_or("")
+                        .to_string();
                     vec![n, dt, trunc(&d, 50)]
                 })
                 .collect();
@@ -156,7 +176,9 @@ fn urlencode(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     for b in s.bytes() {
         match b {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => out.push(b as char),
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                out.push(b as char)
+            }
             _ => out.push_str(&format!("%{:02X}", b)),
         }
     }

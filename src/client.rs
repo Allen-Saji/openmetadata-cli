@@ -52,7 +52,9 @@ impl OmdClient {
         let mut req = self.http.request(method, &url).query(query);
         req = self.authed(req);
         if let Some(b) = body {
-            req = req.header(header::CONTENT_TYPE, "application/json").json(&b);
+            req = req
+                .header(header::CONTENT_TYPE, "application/json")
+                .json(&b);
         }
         let resp = req.send().await?;
         Ok(resp)

@@ -1,8 +1,8 @@
 use crate::config::ResolvedConfig;
 use crate::error::CliResult;
 use crate::output;
-use crate::spec::parser;
 use crate::output::OutputCtx;
+use crate::spec::parser;
 #[derive(clap::Args, Debug)]
 pub struct SyncArgs {
     /// Fetch from a custom URL instead of the configured host's /swagger.json
@@ -37,9 +37,21 @@ pub async fn run(profile: &str, args: SyncArgs, ctx: &OutputCtx) -> CliResult<()
     let spec: serde_json::Value = resp.json().await?;
     parser::save_cache(&spec)?;
 
-    let title = spec.get("info").and_then(|i| i.get("title")).and_then(|s| s.as_str()).unwrap_or("(unknown)");
-    let version = spec.get("info").and_then(|i| i.get("version")).and_then(|s| s.as_str()).unwrap_or("?");
-    let paths = spec.get("paths").and_then(|p| p.as_object()).map(|o| o.len()).unwrap_or(0);
+    let title = spec
+        .get("info")
+        .and_then(|i| i.get("title"))
+        .and_then(|s| s.as_str())
+        .unwrap_or("(unknown)");
+    let version = spec
+        .get("info")
+        .and_then(|i| i.get("version"))
+        .and_then(|s| s.as_str())
+        .unwrap_or("?");
+    let paths = spec
+        .get("paths")
+        .and_then(|p| p.as_object())
+        .map(|o| o.len())
+        .unwrap_or(0);
 
     if output::pretty(ctx) {
         output::success(format!("cached {title} v{version} ({paths} paths)"));
