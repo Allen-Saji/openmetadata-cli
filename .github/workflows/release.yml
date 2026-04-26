@@ -28,7 +28,10 @@ jobs:
             target: aarch64-unknown-linux-gnu
             platform: aarch64-linux
             cross: true
-          - os: macos-13
+          # Both mac targets build on macos-14 (aarch64). The x86_64 binary is
+          # cross-compiled via rustup target add — macos-13 (Intel) runners
+          # are being deprecated and have long queue times.
+          - os: macos-14
             target: x86_64-apple-darwin
             platform: x86_64-darwin
           - os: macos-14
