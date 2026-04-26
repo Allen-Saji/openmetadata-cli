@@ -4,7 +4,7 @@ Command-line tool for [OpenMetadata](https://github.com/open-metadata/OpenMetada
 
 Dynamic command surface generated from OpenMetadata's OpenAPI spec, plus hand-tuned "smart" commands for the common workflows (search, describe, lineage, quality, CSV import/export). Structured JSON output for scripts and agents. Ships an MCP server mode (`omd mcp`) so AI agents can drive OpenMetadata directly.
 
-Status: **v0.7**.
+Status: **v0.7.0 released** — install via `cargo install omd-cli`, `brew install`, the curl one-liner, or grab a [release tarball](https://github.com/Allen-Saji/openmetadata-cli/releases/latest).
 
 ## Install
 
@@ -53,7 +53,7 @@ cargo install --path .
 omd configure                              # interactive setup
 omd auth login                             # paste JWT (input hidden)
 omd auth status                            # verify
-omd search tables customer                 # find entities
+omd search "customer" --index table        # find entities (use --index for type filter)
 omd describe service.db.schema.table       # show entity details
 omd raw GET v1/tables -q limit=5           # escape hatch
 omd sync                                   # refresh cached OpenAPI spec
@@ -98,9 +98,14 @@ omd edit svc.db.schema.orders --owner some.user         # FQN of user or team
 omd edit svc.db.schema.orders --tier Tier.Tier1
 omd edit ... --dry-run                                  # print patch, don't send
 
-# Tags
+# Tags (entity-level)
 omd tag svc.db.schema.orders --add PII.Sensitive --add Tier.Tier2
 omd tag svc.db.schema.orders --remove PII.Sensitive
+
+# Tags (column-level — pass the column FQN; omd resolves the parent table
+# and patches /columns/<idx>/tags for you)
+omd tag svc.db.schema.orders.email --add PII.Sensitive
+omd tag svc.db.schema.orders.email --type column --add PII.Sensitive  # explicit hint
 
 # Glossary
 omd glossary assign svc.db.schema.orders --term CustomerData.Email
@@ -233,10 +238,12 @@ Stored in `~/.omd/`:
 - v0.2 dynamic command generation from OpenAPI spec
 - v0.3 lineage, quality, edit, tag, glossary, completions
 - v0.4 CSV import/export
-- v0.5 MCP server mode (rmcp, 14 curated tools)
+- v0.5 MCP server mode (rmcp, 14 default tools + 1 opt-in `raw_request`)
 - v0.6 SSO login (OIDC/PKCE with browser loopback)
-- v0.7 release automation (install.sh, CI, tag-triggered cross-platform builds, Homebrew draft)
-- v1.0 stable
+- v0.7 release automation: install.sh, tag-triggered cross-platform builds,
+  crates.io, Homebrew tap. **Released 2026-04-26.** Includes column-level
+  tag routing for the CLI and MCP `add_tag`/`remove_tag` tools.
+- v1.0 stable; propose adoption into the `open-metadata` org
 
 ## License
 
