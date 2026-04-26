@@ -83,7 +83,13 @@ jobs:
           cp README.md LICENSE dist/
           tar -C dist -czf "$name" omd README.md LICENSE
           echo "ASSET=$name" >> "$GITHUB_ENV"
-          sha256sum "$name" > "$name.sha256"
+          # macOS ships shasum (BSD), Linux ships sha256sum (GNU coreutils).
+          # Both produce the same "<hex>  <filename>" output format.
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "$name" > "$name.sha256"
+          else
+            shasum -a 256 "$name" > "$name.sha256"
+          fi
           echo "ASSET_SHA=$name.sha256" >> "$GITHUB_ENV"
 
       - name: Package (windows)
