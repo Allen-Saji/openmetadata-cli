@@ -29,7 +29,7 @@ brew install omd
 ### Cargo
 
 ```bash
-cargo install openmetadata-cli            # publishes the `omd` binary
+cargo install omd-cli                     # publishes the `omd` binary
 ```
 
 ### Manual

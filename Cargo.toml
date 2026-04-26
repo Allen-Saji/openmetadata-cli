@@ -1,5 +1,5 @@
 [package]
-name = "openmetadata-cli"
+name = "omd-cli"
 version = "0.7.0"
 edition = "2021"
 description = "Command-line tool for OpenMetadata"
