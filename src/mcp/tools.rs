@@ -569,13 +569,29 @@ async fn mutate_tags(
     remove: Option<&str>,
 ) -> Result<CallToolResult, McpError> {
     let client = server.client()?;
-    let (ty, current) = entity::fetch_by_fqn(&client, fqn, hint, Some("tags"))
+    let target = entity::fetch_target(&client, fqn, hint, Some("tags"))
         .await
         .map_err(to_mcp)?;
-    let id = entity::entity_id(&current).ok_or_else(|| to_mcp(CliError::NotFound(fqn.into())))?;
 
-    let mut tags: Vec<Value> = current
-        .get("tags")
+    let (current_tags_obj, patch_path) = match &target {
+        entity::FetchTarget::Entity { value, .. } => (value.get("tags"), "/tags".to_string()),
+        entity::FetchTarget::Column {
+            value,
+            column_index,
+            ..
+        } => {
+            let col = value
+                .get("columns")
+                .and_then(|c| c.as_array())
+                .and_then(|arr| arr.get(*column_index));
+            (
+                col.and_then(|c| c.get("tags")),
+                format!("/columns/{column_index}/tags"),
+            )
+        }
+    };
+
+    let mut tags: Vec<Value> = current_tags_obj
         .and_then(|t| t.as_array())
         .cloned()
         .unwrap_or_default();
@@ -595,13 +611,13 @@ async fn mutate_tags(
             }));
         }
     }
-    let op = if current.get("tags").is_some() {
+    let op = if current_tags_obj.is_some() {
         "replace"
     } else {
         "add"
     };
-    let patch = json!([{ "op": op, "path": "/tags", "value": tags }]);
-    let path = format!("{}/{}", entity::endpoint_for_type(&ty), id);
+    let patch = json!([{ "op": op, "path": patch_path, "value": tags }]);
+    let path = format!("{}/{}", entity::endpoint_for_type(target.ty()), target.id());
     let v = client.json_patch(&path, &patch).await.map_err(to_mcp)?;
     json_tool_result(&v)
 }

@@ -299,6 +299,100 @@ fn tag_dry_run_no_http_call() {
     assert!(s.contains("Classification"));
 }
 
+#[test]
+fn tag_column_routes_through_parent_table() {
+    let server = MockServer::start();
+    // Auto-detect path: original FQN search returns no hit -> 404 entity GET.
+    server.mock(|when, then| {
+        when.method(GET)
+            .path("/api/v1/search/query")
+            .query_param("q", "fullyQualifiedName:\"svc.db.s.orders.email\"");
+        then.status(200).json_body(json!({"hits": {"hits": []}}));
+    });
+    // Then the column-fallback path resolves the parent table directly.
+    server.mock(|when, then| {
+        when.method(GET)
+            .path("/api/v1/tables/name/svc.db.s.orders")
+            .query_param("fields", "tags,columns");
+        then.status(200).json_body(json!({
+            "id": "tbl-1",
+            "tags": [],
+            "columns": [
+                {"name": "id", "tags": []},
+                {"name": "email", "tags": []},
+                {"name": "phone", "tags": []}
+            ]
+        }));
+    });
+    let patch_hit = server.mock(|when, then| {
+        when.method(PATCH)
+            .path("/api/v1/tables/tbl-1")
+            .header("content-type", "application/json-patch+json")
+            .body_contains("/columns/1/tags")
+            .body_contains("PII.Sensitive");
+        then.status(200).json_body(json!({"id": "tbl-1"}));
+    });
+    let home = TempHome::new(&server.base_url());
+    let out = home
+        .cmd(&[
+            "tag",
+            "svc.db.s.orders.email",
+            "--add",
+            "PII.Sensitive",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    patch_hit.assert();
+}
+
+#[test]
+fn tag_column_with_explicit_type_skips_entity_search() {
+    let server = MockServer::start();
+    server.mock(|when, then| {
+        when.method(GET)
+            .path("/api/v1/tables/name/svc.db.s.orders")
+            .query_param("fields", "tags,columns");
+        then.status(200).json_body(json!({
+            "id": "tbl-1",
+            "columns": [
+                {"name": "id"},
+                {"name": "ssn", "tags": [{"tagFQN": "PII.Sensitive"}]}
+            ]
+        }));
+    });
+    let patch_hit = server.mock(|when, then| {
+        when.method(PATCH)
+            .path("/api/v1/tables/tbl-1")
+            .body_contains("/columns/1/tags");
+        then.status(200).json_body(json!({"id": "tbl-1"}));
+    });
+    let home = TempHome::new(&server.base_url());
+    let out = home
+        .cmd(&[
+            "tag",
+            "svc.db.s.orders.ssn",
+            "--type",
+            "column",
+            "--remove",
+            "PII.Sensitive",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    patch_hit.assert();
+}
+
 // ------- glossary -------
 
 #[test]
